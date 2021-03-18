@@ -1,0 +1,12 @@
+dist
+dist-*
+.ghc.environment.*
+result
+result-2
+.shake
+.neuron
+neuron.prof
+
+# CI
+tmp
+neuron-linux-bundle

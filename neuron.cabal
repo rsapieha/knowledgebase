@@ -1,0 +1,209 @@
+cabal-version: 2.4
+name: neuron
+version: 1.9.25.0
+license: AGPL-3.0-only
+copyright: 2020 Sridhar Ratnakumar
+maintainer: srid@srid.ca
+author: Sridhar Ratnakumar
+category: Web
+homepage: https://neuron.zettel.page
+bug-reports: https://github.com/srid/neuron/issues
+synopsis:
+  Future-proof system for plain-text notes.
+description:
+  neuron is a future-proof system for managing and publishing your plain-text Zettelkasten notes.
+data-files:
+  neuron-search
+
+source-repository head
+    type: git
+    location: https://github.com/srid/neuron
+
+flag ghcid
+    default: False
+    manual: True
+
+common ghc-common
+  ghc-options:
+    -Wall
+    -Wincomplete-record-updates
+    -Wincomplete-uni-patterns
+
+common library-common
+  import: ghc-common
+  default-language: Haskell2010
+  build-depends:
+    base >=4.12 && < 4.15,
+    aeson-gadt-th >= 0.2.5.0,
+    aeson-pretty,
+    aeson,
+    algebraic-graphs >= 0.5,
+    ansi-terminal,
+    async,
+    clay,
+    co-log,
+    commonmark ^>= 0.1.0.2,
+    commonmark-extensions ^>= 0.2.0.4,
+    commonmark-pandoc >= 0.1.0.0 && < 0.3,
+    constraints-extras,
+    containers,
+    data-default,
+    dependent-map,
+    dependent-sum-aeson-orphans >= 0.2.1.0,
+    dependent-sum-template,
+    dependent-sum,
+    dhall >= 1.30,
+    directory-contents,
+    directory,
+    either,
+    exceptions,
+    feed,
+    file-embed,
+    filepath,
+    filepattern,
+    foldl,
+    fsnotify,
+    HsYAML,
+    iso8601-time,
+    lsp,
+    megaparsec,
+    modern-uri,
+    mtl,
+    optparse-applicative,
+    pandoc-link-context >= 1.0.2,
+    pandoc-types >= 1.21,
+    parsec,
+    parser-combinators,
+    reflex-dom-core,
+    reflex-dom-pandoc >= 0.7.9.0,
+    reflex-fsnotify,
+    reflex,
+    relude,
+    shower,
+    tagged,
+    text,
+    time,
+    timeit,
+    unix,
+    uri-encode,
+    uuid,
+    wai-app-static,
+    wai-extra,
+    warp,
+    which,
+    with-utf8,
+
+library
+  import: library-common
+  hs-source-dirs: src
+  exposed-modules:
+    Neuron.Config.Type
+    Neuron.Markdown
+    Neuron.Plugin
+    Neuron.Plugin.Type
+    Neuron.Plugin.Plugins.DirTree
+    Neuron.Plugin.Plugins.NeuronIgnore
+    Neuron.Plugin.Plugins.Tags
+    Neuron.Plugin.Plugins.Links
+    Neuron.Plugin.Plugins.UpTree
+    Neuron.Plugin.Plugins.Feed
+    Neuron.Zettelkasten.ID
+    Neuron.Zettelkasten.Zettel
+    Neuron.Zettelkasten.Zettel.Error
+    Neuron.Zettelkasten.Zettel.Parser
+    Neuron.Zettelkasten.Connection
+    Neuron.Zettelkasten.Query
+    Neuron.Zettelkasten.Query.Graph
+    Neuron.Zettelkasten.Graph
+    Neuron.Zettelkasten.Graph.Type
+    Neuron.Zettelkasten.Graph.Build
+    Neuron.Zettelkasten.Resolver
+    Neuron.Cache.Type
+    Neuron.Frontend.Route
+    Neuron.Frontend.Route.Data
+    Neuron.Frontend.Route.Data.Types
+    Neuron.Frontend.Manifest
+    Neuron.Frontend.Common
+    Neuron.Frontend.Widget
+    Neuron.Frontend.Widget.InvertedTree
+    Neuron.Frontend.Zettel.View
+    Neuron.Frontend.Zettel.CSS
+    Neuron.Frontend.Impulse
+    Neuron.Frontend.Theme
+    Neuron.Frontend.View
+    Neuron.Frontend.CSS
+    Text.Megaparsec.Simple
+    Text.Pandoc.Util
+    Text.URI.Util
+    Data.TagTree
+    Data.PathTree
+    Data.Graph.Labelled
+    Data.Graph.Labelled.Type
+    Data.Graph.Labelled.Algorithm
+    Data.Graph.Labelled.Build
+    Data.Time.DateMayTime
+    Data.YAML.ToJSON
+    Data.Structured.Breadcrumb
+    Data.Structured.OpenGraph
+    Data.Structured.OpenGraph.Render
+    System.Directory.Contents.Extra
+    Options.Applicative.Extra
+    Neuron.Backend
+    Neuron.LSP
+    Neuron.Reactor
+    Neuron.Reactor.Build
+    Neuron.CLI.App
+    Neuron.CLI.Query
+    Neuron.CLI.Logging
+    Neuron.CLI.New
+    Neuron.CLI.Open
+    Neuron.CLI.Search
+    Neuron.CLI.Types
+    Neuron.CLI.Parser
+    Neuron.Config
+    Neuron.Version
+    Neuron.Cache
+    Neuron.Frontend.Static.Html
+    Neuron.Frontend.Static.HeadHtml
+    Neuron.Frontend.Static.StructuredData
+    Neuron.Zettelkasten.ID.Scheme
+  autogen-modules:
+    Paths_neuron
+  other-modules:
+    Paths_neuron
+
+test-suite neuron-test
+  import: library-common
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: Spec.hs
+  build-depends:
+    relude,
+    hspec,
+    QuickCheck,
+    time
+  default-language:    Haskell2010
+  if (flag(ghcid))
+    hs-source-dirs: src
+  else
+    build-depends: neuron
+    other-modules:
+      Data.PathTreeSpec
+      Data.TagTreeSpec
+      Data.Graph.Labelled.AlgorithmSpec
+      Neuron.VersionSpec
+      Neuron.Zettelkasten.ID.SchemeSpec
+      Neuron.Zettelkasten.IDSpec
+      Neuron.Zettelkasten.ZettelSpec
+
+-- To profile: ghc-options: -fexternal-interpreter -prof -fprof-auto -rtsopts
+executable neuron
+  import: library-common
+  hs-source-dirs: exe
+  main-is: Main.hs
+  -- FIXME: Threaded runtime causes high cpu usage when using reflex headless 
+  -- ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  if (flag(ghcid))
+    hs-source-dirs: src
+  else
+    build-depends: neuron
